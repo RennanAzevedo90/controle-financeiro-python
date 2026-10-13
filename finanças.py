@@ -1,4 +1,4 @@
-# Sistema de Controle Financeiro Pessoal
+# Sistema de Controle Financeiro Pessoal - Versão Blindada
 saldo = 0.0
 historico_transacoes = []
 
@@ -27,22 +27,40 @@ while True:
         print("=======================")
         
     elif opcao == "2":
-        valor = float(input("Digite o valor do ganho: R$ "))
-        descricao = input("Digite a descrição (ex: Salário, Freelance): ")
+        # Loop de validação do Ganho
+        while True:
+            try:
+                valor = float(input("Digite o valor do ganho: R$ "))
+                if valor < 0:
+                    print("⚠️ O valor do ganho não pode ser negativo!")
+                    continue
+                break # Sai do loop se o número for válido
+            except ValueError:
+                print("❌ Erro: Digite apenas números válidos (use ponto para centavos).")
         
+        descricao = input("Digite a descrição (ex: Salário, Freelance): ")
         saldo += valor
         historico_transacoes.append(f"Ganho: +R$ {valor:.2f} ({descricao})")
         print("Ganho adicionado com sucesso!")
         
     elif opcao == "3":
-        valor = float(input("Digite o valor do gasto: R$ "))
-        descricao = input("Digite a descrição (ex: Aluguel, Ifood): ")
+        # Loop de validação do Gasto
+        while True:
+            try:
+                valor = float(input("Digite o valor do gasto: R$ "))
+                if valor < 0:
+                    print("⚠️ O valor do gasto não pode ser negativo!")
+                    continue
+                break # Sai do loop se o número for válido
+            except ValueError:
+                print("❌ Erro: Digite apenas números válidos (use ponto para centavos).")
         
+        descricao = input("Digite a descrição (ex: Aluguel, Ifood): ")
         saldo -= valor
         historico_transacoes.append(f"Gasto: -R$ {valor:.2f} ({descricao})")
         print("Gasto registrado com sucesso!")
         
-        # --- BLOCO DE ALERTA CORRIGIDO E ALINHADO ---
+        # Bloco de alerta de saldo
         if saldo <= 0:
             print("\n⚠️ ATENÇÃO CRÍTICA: Seu saldo está zerado ou negativo!")
             print(f"Saldo atual: R$ {saldo:.2f}")
