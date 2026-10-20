@@ -1,15 +1,15 @@
 import os
 
-# Sistema de Controle Financeiro Pessoal - Versão Limite de Gastos
+# Sistema de Controle Financeiro Pessoal - Versão Limpador de Histórico
 saldo = 0.0
 historico_transacoes = []
-limite_gastos = 1000.0  # Limite padrão inicial (R$ 1000,00)
+limite_gastos = 1000.0
 
 # Mapeia a pasta automática do script
 pasta_atual = os.path.dirname(os.path.abspath(__file__))
 caminho_salvamento = os.path.join(pasta_atual, "historico.txt")
 
-# LER O ARQUIVO AO INICIAR O PROGRAMA E RECONSTRUIR DADOS
+# LER O ARQUIVO AO INICIAR O PROGRAMA
 if os.path.exists(caminho_salvamento):
     print("Carregando dados salvos anteriormente...")
     with open(caminho_salvamento, "r", encoding="utf-8") as arquivo:
@@ -32,14 +32,15 @@ if os.path.exists(caminho_salvamento):
 print("--- BEM-VINDO AO SEU CONTROLE FINANCEIRO ---")
 
 while True:
-    # Menu de Opções Atualizado
+    # Menu de Opções Atualizado (7 Opções)
     print("\nEscolha uma opção:")
     print("1 - Ver Saldo e Histórico")
     print("2 - Adicionar Ganho (Receita)")
     print("3 - Adicionar Gasto (Despesa)")
     print("4 - Ver Estatísticas Detalhadas")
-    print("5 - Ajustar Limite de Gastos (Teto)") # Nova funcionalidade!
-    print("6 - Sair do Programa")
+    print("5 - Ajustar Limite de Gastos (Teto)")
+    print("6 - Zerar Histórico (Novo Mês) 🔁") # Nova funcionalidade!
+    print("7 - Sair do Programa")
 
     opcao = input("Digite o número da opção desejada: ")
 
@@ -64,30 +65,25 @@ while True:
         
         with open(caminho_salvamento, "a", encoding="utf-8") as arquivo:
             arquivo.write(linha + "\n")
-            
-        print("Ganho adicionado com sucesso e salvo no arquivo!")
+        print("Ganho adicionado com sucesso!")
 
     elif opcao == "3":
         valor = float(input("Digite o valor do gasto (R$): "))
         
-        # --- ALGORITMO DE VALIDAÇÃO DE LIMITE ---
-        # 1. Descobrir quanto já gastamos no total até agora
         total_gastos_atual = 0.0
         for transacao in historico_transacoes:
             if "[GASTO]" in transacao and "$ " in transacao:
                 partes = transacao.split("$ ")
                 total_gastos_atual += float(partes[1].replace(",", "."))
         
-        # 2. Verificar se o novo gasto estoura o limite definido
         if (total_gastos_atual + valor) > limite_gastos:
             print("\n⚠️  ALERTA DO SISTEMA ⚠️")
-            print(f"Atenção! Esse gasto de R$ {valor:.2f} fará você ultrapassar o seu limite mensal de R$ {limite_gastos:.2f}!")
-            confirmar = input("Deseja confirmar esse gasto mesmo assim? (s/n): ")
+            print(f"Atenção! Esse gasto de R$ {valor:.2f} estourará seu limite mensal de R$ {limite_gastos:.2f}!")
+            confirmar = input("Deseja confirmar mesmo assim? (s/n): ")
             if confirmar.lower() != 's':
-                print("Operação cancelada. O gasto não foi registrado.")
-                continue # Volta para o menu sem salvar
+                print("Operação cancelada.")
+                continue
         
-        # Se passou na validação ou o usuário aceitou, executa o gasto normalmente
         descricao = input("Digite uma descrição (ex: Mercado): ")
         saldo = saldo - valor
         
@@ -96,7 +92,6 @@ while True:
         
         with open(caminho_salvamento, "a", encoding="utf-8") as arquivo:
             arquivo.write(linha + "\n")
-            
         print("Gasto adicionado com sucesso!")
 
     elif opcao == "4":
@@ -110,11 +105,10 @@ while True:
                 partes = transacao.split("$ ")
                 if len(partes) > 1:
                     valor_float = float(partes[1].replace(",", "."))
-                    
                     if "[GANHO]" in transacao:
-                        total_ganhos = total_ganhos + valor_float
+                        total_ganhos += valor_float
                     elif "[GASTO]" in transacao:
-                        total_gastos = total_gastos + valor_float
+                        total_gastos += valor_float
                         if valor_float > maior_gasto:
                             maior_gasto = valor_float
                             
@@ -122,12 +116,28 @@ while True:
         print(f"Custo Total (Despesas): R$ {total_gastos:.2f}")
         print(f"Maior despesa registrada: R$ {maior_gasto:.2f}")
 
-    # --- NOVA OPÇÃO 5: CONFIGURAR LIMITE MENSAL ---
     elif opcao == "5":
-        limite_gastos = float(input(f"Seu limite atual é R$ {limite_gastos:.2f}. Digite o novo limite desejado (R$): "))
-        print(f"Novo limite de gastos configurado para: R$ {limite_gastos:.2f}!")
+        limite_gastos = float(input(f"Seu limite atual é R$ {limite_gastos:.2f}. Digite o novo limite (R$): "))
+        print(f"Novo limite configurado para: R$ {limite_gastos:.2f}!")
 
+    # --- NOVA OPÇÃO 6: ALGORITMO DE LIMPEZA DE DADOS ---
     elif opcao == "6":
+        print("\n⚠️ ATENÇÃO: Isso apagará permanentemente todo o seu histórico atual!")
+        certeza = input("Tem certeza de que deseja zerar os dados para um novo mês? (s/n): ")
+        
+        if certeza.lower() == "s":
+            saldo = 0.0
+            historico_transacoes = [] # Limpa a lista na memória RAM
+            
+            # O modo "w" abre o arquivo limpando tudo o que está dentro dele
+            with open(caminho_salvamento, "w", encoding="utf-8") as arquivo:
+                arquivo.write("") # Escreve um texto vazio
+                
+            print("Histórico e saldo redefinidos com sucesso para o novo mês! 🔁")
+        else:
+            print("Operação cancelada. Seus dados continuam salvos.")
+
+    elif opcao == "7":
         print("\nObrigado por usar o Controle Financeiro. Até logo!")
         break
     else:
