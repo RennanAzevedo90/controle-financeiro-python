@@ -1,6 +1,6 @@
 import os
 
-# Sistema de Controle Financeiro Pessoal - Versão Limpador de Histórico
+# Sistema de Controle Financeiro Pessoal - Versão Modular (Funções)
 saldo = 0.0
 historico_transacoes = []
 limite_gastos = 1000.0
@@ -8,6 +8,23 @@ limite_gastos = 1000.0
 # Mapeia a pasta automática do script
 pasta_atual = os.path.dirname(os.path.abspath(__file__))
 caminho_salvamento = os.path.join(pasta_atual, "historico.txt")
+
+
+# --- 1. DECLARAÇÃO DAS FUNÇÕES (BLOCOS ESPECIALISTAS) ---
+def limpar_arquivo_fisico():
+    with open(caminho_salvamento, "w", encoding="utf-8") as arquivo:
+        arquivo.write("")
+
+def exibir_menu():
+    print("\nEscolha uma opção:")
+    print("1 - Ver Saldo e Histórico")
+    print("2 - Adicionar Ganho (Receita)")
+    print("3 - Adicionar Gasto (Despesa)")
+    print("4 - Ver Estatísticas Detalhadas")
+    print("5 - Ajustar Limite de Gastos (Teto)")
+    print("6 - Zerar Histórico (Novo Mês) 🔁")
+    print("7 - Sair do Programa")
+
 
 # LER O ARQUIVO AO INICIAR O PROGRAMA
 if os.path.exists(caminho_salvamento):
@@ -32,15 +49,8 @@ if os.path.exists(caminho_salvamento):
 print("--- BEM-VINDO AO SEU CONTROLE FINANCEIRO ---")
 
 while True:
-    # Menu de Opções Atualizado (7 Opções)
-    print("\nEscolha uma opção:")
-    print("1 - Ver Saldo e Histórico")
-    print("2 - Adicionar Ganho (Receita)")
-    print("3 - Adicionar Gasto (Despesa)")
-    print("4 - Ver Estatísticas Detalhadas")
-    print("5 - Ajustar Limite de Gastos (Teto)")
-    print("6 - Zerar Histórico (Novo Mês) 🔁") # Nova funcionalidade!
-    print("7 - Sair do Programa")
+    # 2. CHAMANDO A FUNÇÃO DO MENU
+    exibir_menu()
 
     opcao = input("Digite o número da opção desejada: ")
 
@@ -120,19 +130,14 @@ while True:
         limite_gastos = float(input(f"Seu limite atual é R$ {limite_gastos:.2f}. Digite o novo limite (R$): "))
         print(f"Novo limite configurado para: R$ {limite_gastos:.2f}!")
 
-    # --- NOVA OPÇÃO 6: ALGORITMO DE LIMPEZA DE DADOS ---
     elif opcao == "6":
         print("\n⚠️ ATENÇÃO: Isso apagará permanentemente todo o seu histórico atual!")
         certeza = input("Tem certeza de que deseja zerar os dados para um novo mês? (s/n): ")
         
         if certeza.lower() == "s":
             saldo = 0.0
-            historico_transacoes = [] # Limpa a lista na memória RAM
-            
-            # O modo "w" abre o arquivo limpando tudo o que está dentro dele
-            with open(caminho_salvamento, "w", encoding="utf-8") as arquivo:
-                arquivo.write("") # Escreve um texto vazio
-                
+            historico_transacoes = [] 
+            limpar_arquivo_fisico()
             print("Histórico e saldo redefinidos com sucesso para o novo mês! 🔁")
         else:
             print("Operação cancelada. Seus dados continuam salvos.")
